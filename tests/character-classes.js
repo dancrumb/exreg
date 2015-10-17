@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-var exreg = require('../Src');
+var exreg = require('../src');
 var testExreg = function (regex) {
     "use strict";
     expect(exreg(regex)).to.match(new RegExp('^' + regex.source + '$'));

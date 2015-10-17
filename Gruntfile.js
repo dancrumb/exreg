@@ -27,7 +27,7 @@ module.exports = function(grunt) {
         },
         watch:{
             all:{
-                files: files.concat('test/**/*.json'),
+                files: files,
                 tasks:['test']
             }
         }
