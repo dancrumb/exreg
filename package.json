@@ -1,0 +1,34 @@
+{
+  "name": "exreg",
+  "version": "1.0.0",
+  "description": "A \"reverse\" regular expression module. Takes a regular expression and returns a string guaranteed to match it.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dancrumb/exreg.git"
+  },
+  "keywords": [
+    "regex",
+    "test"
+  ],
+  "author": "Dan Rumney <dancrumb@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dancrumb/exreg/issues"
+  },
+  "homepage": "https://github.com/dancrumb/exreg#readme",
+  "devDependencies": {
+    "chai": "*",
+    "grunt": "^0.4.5",
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-mocha-test": "^0.12.7",
+    "mocha": "^2.3.3"
+  },
+  "dependencies": {
+    "lodash": "^3.10.1"
+  }
+}
