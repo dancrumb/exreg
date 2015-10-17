@@ -1,0 +1,29 @@
+language: node_js
+node_js:
+- '0.12'
+before_script:
+- npm install -g grunt-cli codeclimate-test-reporter istanbul
+- git config --global push.default matching
+- git config --global user.email "dancrumb@gmail.com"
+- git config --global user.name "Travis-CI"
+after_success:
+- istanbul cover node_modules/.bin/_mocha test
+- CODECLIMATE_REPO_TOKEN=a22b8402befd0dfc069eeaa0c41a4e2fa966ec72b194c3460788da18e5b91a25 codeclimate-test-reporter < coverage/lcov.info
+deploy:
+  provider: npm
+  email: dancrumb@gmail.com
+  api_key:
+    secure: iThvI597BILT64Ogf4+fbe70ponG1nAmCtcvQLibXwMr6Nw9TwFQfbi66F2YodIDakPIeinDe7Cp1g6X26RBQx9v9KVjWzi98AV0hScGcQPBDIFCqV2xprToqnUPVTJmOiwDAHKLv0FSE3zCuyv64uzO16RcKADSLLvcE4fAEeLnEZcPND8xQDl2XNNksRMwaAecfbUH9j9Ni2iQB/j7w2IslmXzSRB0H1BArOuM/7bwwbf4G/zvREQHTVui+jeiKRNzFZ7uk4kzVSYfhaLtD/ApPNh9j5ROyW84ZxPgsNCU7MkJYQhMg2D2Ht6Cxk4c15ZMFjDspdDf42S787ivujfUJhHvrfWecSMBe+YFImWiIrCvG1ulclUf304s72eJjbhPixEW/Ot2Jp4XjnLTI8urasnX8HAerZrGavMYDRkK2C3d2k+Op5uUPulLb9kWtyhMTjIdNWlV4txXSIxPRmgBa8DkaJvgvvndaOmhdUeh4qMmtDmWNY/ARRFuDbLwFWQZPCoKUYCUuWUf9ALKWUciS0KI48hT4VTaGEhICQidAUKZY99KrOqvuu2IXvJkizWYy1kwojKcsSsxw4qdkkHkw58S87aOdJuUxHQWliwUs5c76bACdHXcFRxPU0LrzmfHQrPtf2GjaBDxhW8yX+BHKT+Rolh3E2mHtKwRFeM=
+  on:
+    branch: master
+before_deploy:
+  - npm version minor
+  - git config credential.helper "store --file=.git/credentials"
+  - echo "https://${GH_TOKEN}:@github.com" > .git/credentials
+  - git push && git push --tags
+env:
+  global:
+    secure: a68KbAnxVl0fjvqur8pOLmnJia1PUO7GdrO9PrBDUG5USgqwfKHS83m6kJwv0ENB5VprCdSK0A3ZM8lhJrhv9cUCZEqApHYgKN47xSVCw9suaQ70hU13ehQdRElblGHmzZI1npe2iG7DThPgG1TZRbo36qwPG0i5fae+XIK7MFKZ4tCCh8gMKCG5suUL5Wqcwjo8P89XdAXMTqZlLEvdkYlLYldsvKu3tgQ/2zvpth0ZwPvlCGLHb2DR+556LW0EbITj3D+A4sDYUXWbdzYwzGerJsogRLvDwgHD+vYelvtITowGrxcLdBOrgiMUmibwgjaYHKkWpUXNdxU2p0Q6HS4VYdSUe1hKwr1/Mw4eF76LkkfVNFjKkt7PlKllSAo/mQNp5ZWNQm4xVXFyF2HrhoFE0YMODjGPTqDROwfXZajDAvcylPLRsCep+QppF1x6WvaCAEr4I5i1jhN1ahNNN77nnUaK42pHYbfqEdMyUUyIWLsAbuIf5LR8nnR36PHcRzTRpD5Yj/KNUmuu8xOD4UaAYFD5zsBRxllMsZjWprkyWs1gEscTr++Gnv/9KUWtf14BDDhpbfqW1sy6ILRAK6OZDIBfb6c4iFQNKAwsMxh/F5PZFvyLRT5ULWNqDtp5W7oGm+2vnDj+ky2ypefqB90KuQOX1gvY9whcKb1gVq8=
+addons:
+    code_climate:
+        repo_token: a22b8402befd0dfc069eeaa0c41a4e2fa966ec72b194c3460788da18e5b91a25

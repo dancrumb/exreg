@@ -1,0 +1,30 @@
+{
+  "asi": false,
+  "boss": true,
+  "node": true,
+  "curly": true,
+  "eqeqeq": true,
+  "eqnull": true,
+  "immed": true,
+  "lastsemic": true,
+  "latedef": true,
+  "laxbreak": true,
+  "laxcomma": true,
+  "mocha": true,
+  "newcap": true,
+  "noarg": true,
+  "nomen": false,
+  "plusplus": false,
+  "sub": true,
+  "strict": true,
+  "undef": true,
+  "white": false,
+  "globals": {
+    "require": false,
+    "module": false,
+    "describe": false,
+    "it": false,
+    "expect": true
+  },
+  "-W030": true
+}
