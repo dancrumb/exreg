@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var expect = require('chai').expect;
 var exreg = require('../src');
 var testExreg = function (regex) {
@@ -48,12 +49,26 @@ describe("exreg", function () {
         expect(exreg(/\WW/)).to.match(/\WW/);
         expect(exreg(/\\W/)).to.match(/\\W/);
     });
+    it('recognises octal codes', function () {
+        testExreg(/\123/);
+        testExreg(/\0ab/);
+        testExreg(/\09b/);
+        testExreg(/\129/);
+        testExreg(/\192/);
+    });
     it('recognises inclusive character classes', function () {
         testExreg(/[a]/);
         testExreg(/[[]/);
         testExreg(/[c-f]/);
-        //testExreg(/[]]/);
         testExreg(/[\]]/);
-
+    });
+    it.skip('recognises exclusive character classes', function () {
+        testExreg(/[^a]/);
+        testExreg(/[^[]/);
+        testExreg(/[^c-f]/);
+        testExreg(/[^\]]/);
+    });
+    it('throws an error if it is passed an empty character class since, in JavaScript, this matches nothing', function () {
+        expect(_.bind(exreg, null, /[]/)).to.throw(Error);
     });
 });

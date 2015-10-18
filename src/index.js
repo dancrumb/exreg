@@ -8,6 +8,43 @@ var basicResponse = function (response, remainder) {
     };
 };
 
+var isNumericString = function (string) {
+    "use strict";
+    return _.isFinite(parseInt(string,10));
+};
+
+var isOctalDigit = function (string) {
+    "use strict";
+    return _.isFinite(parseInt(string,8));
+};
+
+var parseNDigitOctalString = function (length, list) {
+    "use strict";
+    //console.log("Octal: " + length + ", " + list);
+    return basicResponse(
+        String.fromCharCode(
+            parseInt( _.slice(list,0,length).join(""), 8)
+        ), _.slice(list,length))    ;
+};
+
+var parseHexadecimal = function (token, remainder) {
+
+};
+var parseOctal = function (token, remainder) {
+    "use strict";
+    if(!(isOctalDigit(remainder[0]))) {
+        if(token === "0") {
+            return basicResponse("\0", remainder);
+        } else {
+            return parseNDigitOctalString(1, [token].concat(remainder));
+        }
+    } if(!(isOctalDigit(remainder[1]))) {
+        return parseNDigitOctalString(2, [token].concat(remainder));
+    } else {
+
+        return parseNDigitOctalString(3, [token].concat(remainder));
+    }
+};
 var processControlCharacter = function (token, remainder) {
     "use strict";
     //console.log("Looking at cc token: ", token, remainder);
@@ -19,8 +56,13 @@ var processControlCharacter = function (token, remainder) {
         "w": function(token, remainder) { return basicResponse('a', remainder); },
         "W": function(token, remainder) { return basicResponse('!', remainder); },
         "]": function(token, remainder) { return basicResponse(']', remainder); },
-        "\\": function (token, remainder) { return basicResponse("\\", remainder);}
+        "\\": function (token, remainder) { return basicResponse("\\", remainder);},
+        "x": parseHexadecimal
     }[token];
+
+    if(isNumericString(token) && token < 9) {
+        ccHandler = parseOctal;
+    }
 
     if(_.isUndefined(ccHandler)) {
         throw new Error("Unrecognized control character: " + token);
@@ -30,12 +72,16 @@ var processControlCharacter = function (token, remainder) {
 
 var charClassParser = function (token, remainder, validString) {
     "use strict";
-    console.log("parse class: ", token, remainder, validString);
+    //console.log("parse class: ", token, remainder, validString);
     if(_.isUndefined(validString)) {
         validString = "";
     }
 
     if(token === "]") {
+        if(_.isEmpty(validString)) {
+            throw new Error("Character class did not lead to a valid string");
+        }
+
         return basicResponse(validString, remainder);
     } else if (token === "\\") {
         var result = processControlCharacter(_.head(remainder), _.tail(remainder));
