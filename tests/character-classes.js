@@ -5,7 +5,7 @@ var testExreg = function (regex) {
     "use strict";
     expect(exreg(regex)).to.match(new RegExp('^' + regex.source + '$'));
 };
-describe("exreg", function () {
+describe("exreg handles character classes", function () {
     "use strict";
     it('recognises \\d character classes', function () {
         expect(exreg(/\d/)).to.match(/\d/);
@@ -48,13 +48,6 @@ describe("exreg", function () {
         expect(exreg(/W\W/)).to.match(/W\W/);
         expect(exreg(/\WW/)).to.match(/\WW/);
         expect(exreg(/\\W/)).to.match(/\\W/);
-    });
-    it('recognises octal codes', function () {
-        testExreg(/\123/);
-        testExreg(/\0ab/);
-        testExreg(/\09b/);
-        testExreg(/\129/);
-        testExreg(/\192/);
     });
     it('recognises inclusive character classes', function () {
         testExreg(/[a]/);

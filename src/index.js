@@ -27,9 +27,29 @@ var parseNDigitOctalString = function (length, list) {
         ), _.slice(list,length))    ;
 };
 
-var parseHexadecimal = function (token, remainder) {
-
+var createHexParser = function (length) {
+    "use strict";
+    return function (token, remainder) {
+        var digitsToParse = _.slice(remainder, 0, length);
+        if(digitsToParse.length !== length) {
+            throw new Error("Not enough characters in hex string. Expected " + length + ", got " + digitsToParse.length);
+        }
+        var stringToParse = digitsToParse.join("").replace(/^0+(?!$)/, "");
+        var string = String.fromCharCode(
+            parseInt(stringToParse, 16)
+        );
+        if(parseInt(stringToParse, 16).toString(16) !== stringToParse) {
+            throw new Error("Invalid characters in hexadecimal string: " + stringToParse);
+        }
+        if(string === "\0" && stringToParse !== "0") {
+            throw new Error("Cannot generate a string for an invalid hex character class: " + stringToParse);
+        } else {
+            return basicResponse(
+                string, _.slice(remainder,length))    ;
+        }
+    };
 };
+
 var parseOctal = function (token, remainder) {
     "use strict";
     if(!(isOctalDigit(remainder[0]))) {
@@ -48,16 +68,26 @@ var parseOctal = function (token, remainder) {
 var processControlCharacter = function (token, remainder) {
     "use strict";
     //console.log("Looking at cc token: ", token, remainder);
+    var basicHandler = function(response) {
+        return function (token, remainder) {
+             return basicResponse(response, remainder);
+        };
+    };
     var ccHandler = {
-        "d": function(token, remainder) { return basicResponse(0, remainder); },
-        "D": function(token, remainder) { return basicResponse('a', remainder); },
-        "s": function(token, remainder) { return basicResponse(' ', remainder); },
-        "S": function(token, remainder) { return basicResponse('a', remainder); },
-        "w": function(token, remainder) { return basicResponse('a', remainder); },
-        "W": function(token, remainder) { return basicResponse('!', remainder); },
-        "]": function(token, remainder) { return basicResponse(']', remainder); },
-        "\\": function (token, remainder) { return basicResponse("\\", remainder);},
-        "x": parseHexadecimal
+        "d": basicHandler(0),
+        "D": basicHandler('a'),
+        "s": basicHandler(' '),
+        "S": basicHandler('a'),
+        "w": basicHandler('a'),
+        "W": basicHandler('!'),
+        "]": basicHandler(']'),
+        "\\": basicHandler('\\'),
+        "n": basicHandler('\n'),
+        "r": basicHandler('\r'),
+        "t": basicHandler('\t'),
+        ".": basicHandler('.'),
+        "x": createHexParser(2),
+        "u": createHexParser(4)
     }[token];
 
     if(isNumericString(token) && token < 9) {
@@ -107,6 +137,8 @@ var processRegEx = function(candidateString, token, remainder) {
         result = charClassParser(_.head(remainder), _.tail(remainder));
         candidateString += result.candidateString;
         remainder = result.remainder;
+    } else if(token === "|") {
+        return candidateString;
     } else {
         candidateString += token;
     }
