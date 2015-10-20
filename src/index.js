@@ -82,6 +82,8 @@ var processControlCharacter = function (token, remainder) {
         "W": basicHandler('!'),
         "]": basicHandler(']'),
         "\\": basicHandler('\\'),
+        "*": basicHandler('*'),
+        "+": basicHandler('+'),
         "n": basicHandler('\n'),
         "r": basicHandler('\r'),
         "t": basicHandler('\t'),
@@ -123,7 +125,38 @@ var charClassParser = function (token, remainder, validString) {
 
 };
 
+var arrayToNumber = function (digitArray, defaultValue) {
+    "use strict";
+    if(_.isEmpty(digitArray)) {
+        return defaultValue || Number.NaN;
+    } else {
+        return parseInt(digitArray.join(""), 10);
+    }
+};
 
+var processQuantifier = function (token, remainder, string) {
+    "use strict";
+    var quantity = _.takeWhile(remainder, function(token) {
+        return token !== "}";
+    });
+    var start = arrayToNumber(_.takeWhile(quantity, function(value) {
+        return value !== ",";
+    }));
+    var end = arrayToNumber(_.takeRightWhile(quantity, function(value) {
+        return value !== ",";
+    }), start);
+
+    //console.log(start, end);
+    if(_.isNaN(start)) {
+        throw new Error("Invalid quantifier: {" + quantity.join("") +"}");
+    }
+
+    var duplicated = _.times(start, function () {
+        return string;
+    });
+
+    return basicResponse(duplicated.join(""), _.slice(remainder, quantity.length+1));
+};
 
 var processRegEx = function(candidateString, token, remainder) {
     "use strict";
@@ -131,19 +164,28 @@ var processRegEx = function(candidateString, token, remainder) {
     //console.log("Processing: ", candidateString, token, remainder);
     if(token === "\\") {
         result = processControlCharacter(_.head(remainder), _.tail(remainder));
-        candidateString += result.candidateString;
+        candidateString.push(result.candidateString);
         remainder = result.remainder;
     } else if (token === "[") {
         result = charClassParser(_.head(remainder), _.tail(remainder));
-        candidateString += result.candidateString;
+        candidateString.push(result.candidateString);
         remainder = result.remainder;
     } else if(token === "|") {
-        return candidateString;
+        return candidateString.join("");
+    } else if(token === "*") {
+
+    } else if(token === "+") {
+
+    } else if(token === "{") {
+        var quantity = processQuantifier(token, remainder, candidateString.pop());
+        candidateString.push(quantity.candidateString);
+        remainder = quantity.remainder;
+
     } else {
-        candidateString += token;
+        candidateString.push(token);
     }
     if(_.isEmpty(remainder)){
-        return candidateString;
+        return candidateString.join("");
     } else {
         return processRegEx(candidateString, _.head(remainder), _.tail(remainder));
     }
@@ -156,7 +198,7 @@ var parse = function (regexString) {
     regexTokens.pop();
     regexTokens.shift();
     //console.log("evaluating: " + regexTokens);
-    return processRegEx("", _.head(regexTokens), _.tail(regexTokens));
+    return processRegEx([], _.head(regexTokens), _.tail(regexTokens));
 };
 
 module.exports = function (regex) {
