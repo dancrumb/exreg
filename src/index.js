@@ -1,5 +1,7 @@
 var _ = require('lodash');
 
+var processRegEx;
+
 var basicResponse = function (response, remainder) {
     "use strict";
     return {
@@ -158,7 +160,34 @@ var processQuantifier = function (token, remainder, string) {
     return basicResponse(duplicated.join(""), _.slice(remainder, quantity.length+1));
 };
 
-var processRegEx = function(candidateString, token, remainder) {
+var processGroup = function (token, remainder) {
+    "use strict";
+    var capture = true;
+    if(remainder[0] === "?" && remainder[1] === ":") {
+        remainder = _.slice(remainder,2);
+        capture = false;
+    }
+    var parenCount = 1;
+    var group = _.takeWhile(remainder, function(token) {
+        if(token === "(") {
+            parenCount += 1;
+        } else if(token === ")") {
+            parenCount -= 1;
+        }
+        return parenCount > 0;
+    });
+    console.log(group);
+    var processedGroup = processRegEx([], _.head(group), _.tail(group), []);
+    console.log(processedGroup);
+
+    var response = basicResponse(processedGroup, _.slice(remainder, group.length+1));
+    if(capture) {
+        response.captured = processedGroup;
+    }
+    return response;
+};
+
+processRegEx = function(candidateString, token, remainder, captures) {
     "use strict";
     var result;
     //console.log("Processing: ", candidateString, token, remainder);
@@ -181,13 +210,24 @@ var processRegEx = function(candidateString, token, remainder) {
         candidateString.push(quantity.candidateString);
         remainder = quantity.remainder;
 
+    } else if(token === "(") {
+        var group = processGroup(token, remainder);
+        candidateString.push(group.candidateString);
+        remainder = group.remainder;
+        if(group.captured) {
+            captures.push(group.captured);
+        }
+
     } else {
         candidateString.push(token);
     }
     if(_.isEmpty(remainder)){
+        if(!_.isEmpty(captures)) {
+            console.log("Captures: " + captures);
+        }
         return candidateString.join("");
     } else {
-        return processRegEx(candidateString, _.head(remainder), _.tail(remainder));
+        return processRegEx(candidateString, _.head(remainder), _.tail(remainder), captures);
     }
 
 };
@@ -198,7 +238,7 @@ var parse = function (regexString) {
     regexTokens.pop();
     regexTokens.shift();
     //console.log("evaluating: " + regexTokens);
-    return processRegEx([], _.head(regexTokens), _.tail(regexTokens));
+    return processRegEx([], _.head(regexTokens), _.tail(regexTokens), []);
 };
 
 module.exports = function (regex) {
