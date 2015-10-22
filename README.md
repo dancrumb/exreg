@@ -1,4 +1,10 @@
 # exreg
+[![npm package](https://nodei.co/npm/exreg.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/exreg/)
+
+[![Build Status](https://travis-ci.org/dancrumb/exreg.svg?branch=master)](https://travis-ci.org/dancrumb/exreg)
+[![Code Climate](https://codeclimate.com/github/dancrumb/exreg/badges/gpa.svg)](https://codeclimate.com/github/dancrumb/exreg)
+[![Test Coverage](https://codeclimate.com/github/dancrumb/exreg/badges/coverage.svg)](https://codeclimate.com/github/dancrumb/exreg/coverage)
+
 A module to generate strings to match regular expressions
 
 ## Creating Strings for regular expressions
