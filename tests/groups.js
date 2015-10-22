@@ -1,8 +1,5 @@
-var _ = require('lodash');
-var expect = require('chai').expect;
-var exreg = require('../src');
 var testExreg = require('./testExreg');
-describe("exreg handles regex quantifiers", function () {
+describe("exreg handles regex groups", function () {
     "use strict";
     it('recognises capturing groups bound by parantheses', function () {
         testExreg(/(a)/);

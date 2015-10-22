@@ -144,9 +144,6 @@ var processQuantifier = function (token, remainder, string) {
     var start = arrayToNumber(_.takeWhile(quantity, function(value) {
         return value !== ",";
     }));
-    var end = arrayToNumber(_.takeRightWhile(quantity, function(value) {
-        return value !== ",";
-    }), start);
 
     //console.log(start, end);
     if(_.isNaN(start)) {
@@ -176,9 +173,9 @@ var processGroup = function (token, remainder) {
         }
         return parenCount > 0;
     });
-    console.log(group);
+    //console.log(group);
     var processedGroup = processRegEx([], _.head(group), _.tail(group), []);
-    console.log(processedGroup);
+    //console.log(processedGroup);
 
     var response = basicResponse(processedGroup, _.slice(remainder, group.length+1));
     if(capture) {
@@ -223,7 +220,7 @@ processRegEx = function(candidateString, token, remainder, captures) {
     }
     if(_.isEmpty(remainder)){
         if(!_.isEmpty(captures)) {
-            console.log("Captures: " + captures);
+            //console.log("Captures: " + captures);
         }
         return candidateString.join("");
     } else {
