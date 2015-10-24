@@ -1,6 +1,6 @@
 {
   "name": "exreg",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A \"reverse\" regular expression module. Takes a regular expression and returns a string guaranteed to match it.",
   "main": "src/index.js",
   "scripts": {
@@ -21,8 +21,8 @@
     "url": "https://github.com/dancrumb/exreg/issues"
   },
   "homepage": "https://github.com/dancrumb/exreg#readme",
-  "engines" : {
-    "node" : ">=0.12"
+  "engines": {
+    "node": ">=0.12"
   },
   "devDependencies": {
     "chai": "*",
