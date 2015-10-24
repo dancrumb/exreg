@@ -2,7 +2,7 @@
   "name": "exreg",
   "version": "1.1.1",
   "description": "A \"reverse\" regular expression module. Takes a regular expression and returns a string guaranteed to match it.",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "grunt test"
   },
@@ -15,11 +15,15 @@
     "test"
   ],
   "author": "Dan Rumney <dancrumb@gmail.com>",
+  "contributors": [],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/dancrumb/exreg/issues"
   },
   "homepage": "https://github.com/dancrumb/exreg#readme",
+  "engines" : {
+    "node" : ">=0.12"
+  },
   "devDependencies": {
     "chai": "*",
     "grunt": "^0.4.5",
