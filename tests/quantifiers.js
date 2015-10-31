@@ -48,5 +48,6 @@ describe("exreg handles regex quantifiers", function () {
     });
     it('rejects {,x} quantifiers', function () {
         expect(_.bind(exreg, null, /a{,2}/)).to.throw(Error);
+        expect(function () { exreg(/a{5,2}/); }).to.throw(Error);
     });
 });

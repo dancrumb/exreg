@@ -1,9 +1,9 @@
+"use strict";
 var _ = require('lodash');
 
 var processRegEx;
 
 var basicResponse = function (response, remainder) {
-    "use strict";
     return {
         candidateString: response,
         remainder: remainder
@@ -11,17 +11,14 @@ var basicResponse = function (response, remainder) {
 };
 
 var isNumericString = function (string) {
-    "use strict";
     return _.isFinite(parseInt(string,10));
 };
 
 var isOctalDigit = function (string) {
-    "use strict";
     return _.isFinite(parseInt(string,8));
 };
 
 var parseNDigitOctalString = function (length, list) {
-    "use strict";
     //console.log("Octal: " + length + ", " + list);
     return basicResponse(
         String.fromCharCode(
@@ -30,7 +27,6 @@ var parseNDigitOctalString = function (length, list) {
 };
 
 var createHexParser = function (length) {
-    "use strict";
     return function (token, remainder) {
         var digitsToParse = _.slice(remainder, 0, length);
         if(digitsToParse.length !== length) {
@@ -53,7 +49,6 @@ var createHexParser = function (length) {
 };
 
 var parseOctal = function (token, remainder) {
-    "use strict";
     if(!(isOctalDigit(remainder[0]))) {
         if(token === "0") {
             return basicResponse("\0", remainder);
@@ -68,7 +63,6 @@ var parseOctal = function (token, remainder) {
     }
 };
 var processControlCharacter = function (token, remainder) {
-    "use strict";
     //console.log("Looking at cc token: ", token, remainder);
     var basicHandler = function(response) {
         return function (token, remainder) {
@@ -105,7 +99,6 @@ var processControlCharacter = function (token, remainder) {
 };
 
 var charClassParser = function (token, remainder, validString) {
-    "use strict";
     //console.log("parse class: ", token, remainder, validString);
     if(_.isUndefined(validString)) {
         validString = "";
@@ -128,7 +121,6 @@ var charClassParser = function (token, remainder, validString) {
 };
 
 var arrayToNumber = function (digitArray, defaultValue) {
-    "use strict";
     if(_.isEmpty(digitArray)) {
         return defaultValue || Number.NaN;
     } else {
@@ -136,21 +128,35 @@ var arrayToNumber = function (digitArray, defaultValue) {
     }
 };
 
+var MAX_RAND_INT = 1024;
+var randFromRange = function (start, end) {
+    if(_.isNaN(start)) {
+        throw new Error("Must provide a start value to randFromRange");
+    } else if(start === end) {
+        return start;
+    } else if(_.isNaN(end)) {
+        end = MAX_RAND_INT;
+    }
+
+    return Math.floor(Math.random() * (end - start + 1)) + start;
+};
+
 var processQuantifier = function (token, remainder, string) {
-    "use strict";
     var quantity = _.takeWhile(remainder, function(token) {
         return token !== "}";
     });
     var start = arrayToNumber(_.takeWhile(quantity, function(value) {
         return value !== ",";
     }));
+    var end = arrayToNumber(_.takeRightWhile(quantity, function(value) {
+        return value !== ",";
+    }));
 
-    //console.log(start, end);
     if(_.isNaN(start)) {
         throw new Error("Invalid quantifier: {" + quantity.join("") +"}");
     }
 
-    var duplicated = _.times(start, function () {
+    var duplicated = _.times(randFromRange(start,end), function () {
         return string;
     });
 
@@ -158,7 +164,6 @@ var processQuantifier = function (token, remainder, string) {
 };
 
 var processGroup = function (token, remainder) {
-    "use strict";
     var capture = true;
     if(remainder[0] === "?" && remainder[1] === ":") {
         remainder = _.slice(remainder,2);
@@ -185,7 +190,6 @@ var processGroup = function (token, remainder) {
 };
 
 processRegEx = function(candidateString, token, remainder, captures) {
-    "use strict";
     var result;
     //console.log("Processing: ", candidateString, token, remainder);
     if(token === "\\") {
@@ -230,7 +234,6 @@ processRegEx = function(candidateString, token, remainder, captures) {
 };
 
 var parse = function (regexString) {
-    "use strict";
     var regexTokens = regexString.split('');
     regexTokens.pop();
     regexTokens.shift();
@@ -239,7 +242,6 @@ var parse = function (regexString) {
 };
 
 module.exports = function (regex) {
-    "use strict";
     var regObj = new RegExp(regex);
     var regStr = regObj.toString();
 
