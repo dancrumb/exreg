@@ -4,7 +4,9 @@
   "description": "A \"reverse\" regular expression module. Takes a regular expression and returns a string guaranteed to match it.",
   "main": "src/index.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "preversion": "npm test",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
