@@ -1,6 +1,6 @@
 {
   "name": "exreg",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A \"reverse\" regular expression module. Takes a regular expression and returns a string guaranteed to match it.",
   "main": "src/index.js",
   "scripts": {
