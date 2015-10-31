@@ -134,7 +134,7 @@ var randFromRange = function (start, end) {
         throw new Error("Must provide a start value to randFromRange");
     } else if(start === end) {
         return start;
-    } else if(_.isNaN(end)) {
+    } else if(_.isNaN(end) || _.isUndefined(end)) {
         end = MAX_RAND_INT;
     }
 
