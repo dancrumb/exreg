@@ -30,7 +30,8 @@ var createHexParser = function (length) {
     return function (token, remainder) {
         var digitsToParse = _.slice(remainder, 0, length);
         if(digitsToParse.length !== length) {
-            throw new Error("Not enough characters in hex string. Expected " + length + ", got " + digitsToParse.length);
+            throw new Error("Not enough characters in hex string. " +
+                "Expected " + length + ", got " + digitsToParse.length);
         }
         var stringToParse = digitsToParse.join("").replace(/^0+(?!$)/, "");
         var string = String.fromCharCode(
@@ -192,7 +193,26 @@ var processGroup = function (token, remainder) {
 processRegEx = function(candidateString, token, remainder, captures) {
     var result;
     //console.log("Processing: ", candidateString, token, remainder);
+    
+    if(_.isEmpty(remainder)){
+        if(!_.isEmpty(captures)) {
+            //console.log("Captures: " + captures);
+        }
+        return candidateString.join("");
+    } else {
+        return processRegEx(candidateString, _.head(remainder), _.tail(remainder), captures);
+    }
+
+};
+
+var getNextSubExpression = function (regexArray) {
+    var token = _.first(regexArray);
+    var result = {
+        subexpression: "",
+        remainder: []
+    };
     if(token === "\\") {
+        result = getControlCharacter(regexArray)
         result = processControlCharacter(_.head(remainder), _.tail(remainder));
         candidateString.push(result.candidateString);
         remainder = result.remainder;
@@ -222,15 +242,8 @@ processRegEx = function(candidateString, token, remainder, captures) {
     } else {
         candidateString.push(token);
     }
-    if(_.isEmpty(remainder)){
-        if(!_.isEmpty(captures)) {
-            //console.log("Captures: " + captures);
-        }
-        return candidateString.join("");
-    } else {
-        return processRegEx(candidateString, _.head(remainder), _.tail(remainder), captures);
-    }
-
+    
+    return result;
 };
 
 var parse = function (regexString) {
